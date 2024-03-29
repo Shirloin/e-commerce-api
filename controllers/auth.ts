@@ -64,19 +64,20 @@ export function login(req: Request, res: Response, next: NextFunction) {
                 error.statusCode = 401
                 throw error
             }
-            const token = jwt.sign({
+            const user = {
                 userId: loadedUser._id.toString(),
                 username: loadedUser.username,
-                imageUrl: loadedUser.imageUrl,
+                email: loadedUser.email,
+                dob: loadedUser.dob,
+                gender: loadedUser.gender,
+                phone: loadedUser.phone,
+                imageUrl: loadedUser.imageUrl
+            }
+            const token = jwt.sign({
+                userId: loadedUser._id.toString(),
             },
                 SECRET_KEY, { expiresIn: '2h' })
-            res.cookie('authentication', token, {
-                maxAge: 2 * 60 * 60 * 1000,
-            })
-            res.cookie('userid', loadedUser._id.toString(), {
-                maxAge: 2 * 60 * 60 * 1000,
-            })
-            res.status(200).json({ token: token, userId: loadedUser._id.toString() })
+            res.status(200).json({ token: token, user: user, })
         })
         .catch(err => {
             if (!err.statusCode) {

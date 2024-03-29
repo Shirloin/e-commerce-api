@@ -5,7 +5,6 @@ import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import multer, { FileFilterCallback } from 'multer'
 import path from 'path'
-import cookieParser from "cookie-parser"
 
 const app = express()
 
@@ -30,7 +29,6 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
     }
 }
 
-app.use(cookieParser())
 app.use(bodyParser.json())
 
 // Handle CORS

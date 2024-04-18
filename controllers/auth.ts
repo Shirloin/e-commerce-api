@@ -76,7 +76,7 @@ export function login(req: Request, res: Response, next: NextFunction) {
             const token = jwt.sign({
                 userId: loadedUser._id.toString(),
             },
-                SECRET_KEY, { expiresIn: '2h' })
+                SECRET_KEY, { expiresIn: '24h' })
             res.status(200).json({ token: token, user: user, })
         })
         .catch(err => {

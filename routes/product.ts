@@ -32,3 +32,5 @@ router.post('/product', [
     })
 ], create_product)
 
+export default router
+

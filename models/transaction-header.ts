@@ -1,4 +1,14 @@
 import mongoose, { Schema } from "mongoose";
+import { IUser } from "./user";
+import { IShop } from "./shop";
+import { ITransactionDetail } from "./transaction-detail";
+
+export interface ITransactionHeader {
+    date: Date
+    user: IUser
+    shop: IShop
+    transaction_details: ITransactionDetail
+}
 
 const transaction_header_schema = new Schema({
     date: {

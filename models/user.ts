@@ -1,7 +1,26 @@
 import mongoose from "mongoose";
+import { Types } from "mongoose";
 import { Schema } from "mongoose";
+import { IShop } from "./shop";
+import { Model } from "mongoose";
+import { ITransactionHeader } from "./transaction-header";
+import { ICart } from "./cart";
 
-const user_schema = new Schema({
+export interface IUser {
+    _id: Types.ObjectId;
+    username: string;
+    email: string;
+    password: string;
+    dob: Date;
+    gender: string;
+    image_url: string;
+    phone: string;
+    shop: IShop;
+    transactions: ITransactionHeader[]
+    carts: ICart[]
+}
+
+const user_schema = new Schema<IUser>({
     username: {
         type: String,
         required: true
@@ -15,7 +34,7 @@ const user_schema = new Schema({
         required: true
     },
     dob: {
-        type: String,
+        type: Date,
         required: false
     },
     gender: {

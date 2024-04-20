@@ -1,4 +1,17 @@
 import mongoose, { Schema } from "mongoose";
+import { IProduct } from "./product";
+import { ITransactionDetail } from "./transaction-detail";
+import { ICart } from "./cart";
+
+export interface IProductVariant {
+    name: string
+    price: number
+    image_url: string
+    stock: number
+    product: IProduct
+    transaction_details: ITransactionDetail
+    carts: ICart
+}
 
 const product_variant_schema = new Schema({
     name: {

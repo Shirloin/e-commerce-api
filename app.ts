@@ -1,6 +1,8 @@
 require('dotenv').config()
 import express, { NextFunction, Request, Response } from 'express'
-import authRoutes from './routes/auth'
+import authRoutes from "./routes/auth"
+import productRoutes from "./routes/product"
+import shopRoutes from "./routes/shop"
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import multer, { FileFilterCallback } from 'multer'
@@ -45,6 +47,8 @@ app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image')
 
 // API
 app.use(authRoutes)
+app.use(productRoutes)
+app.use(shopRoutes)
 
 // Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

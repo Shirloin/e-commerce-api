@@ -1,7 +1,17 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
+import { ITransactionHeader } from "./transaction-header";
+import { IProduct } from "./product";
+import { IProductVariant } from "./product-variant";
 
-const transaction_detail_schema = new Schema({
+export interface ITransactionDetail {
+    quantity: number
+    transaction_header: ITransactionHeader
+    product: IProduct
+    product_variant: IProductVariant
+}
+
+const transaction_detail_schema = new Schema<ITransactionDetail>({
     quantity: {
         type: Number,
         required: true

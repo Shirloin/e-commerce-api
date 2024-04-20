@@ -15,21 +15,16 @@ const validate_product = [
 ]
 
 const validate_product_variant = [
-    body('name').trim().notEmpty().withMessage('Product variant name must be filled'),
-    body('price').isNumeric().withMessage('Price must be a valid number'),
-    body('image_url').trim().notEmpty().withMessage('Image URL must be provided'),
-    body('stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative integer'),
+    body('product_variants').isArray({ min: 1 }).withMessage('Product variant must be at least one'),
+    body('product_variants.*.name').trim().notEmpty().withMessage('Product variant name must be filled'),
+    body('product_variants.*.price').isInt({ min: 1 }).withMessage('Price must be at least 1'),
+    body('product_variants.*.image_url').trim().notEmpty().withMessage('Image URL must be provided'),
+    body('product_variants.*.stock').isInt({ min: 1 }).withMessage('Stock must be at least 1'),
 ];
 
 router.post('/product', [
     ...validate_product,
-    body('product_variants').isArray({ min: 1 }).withMessage('Product variant must be at least one'),
-    body('product_variants').custom(async (value, { req }) => {
-        for (const variant of value) {
-            await Promise.all(validate_product_variant.map(fn => fn.run(req)))
-        }
-        return true
-    })
+    ...validate_product_variant
 ], create_product)
 
 export default router

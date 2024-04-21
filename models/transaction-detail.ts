@@ -9,6 +9,8 @@ export interface ITransactionDetail {
     transaction_header: ITransactionHeader
     product: IProduct
     product_variant: IProductVariant
+    createdAt: Date
+    updatedAt: Date
 }
 
 const transaction_detail_schema = new Schema<ITransactionDetail>({
@@ -30,5 +32,5 @@ const transaction_detail_schema = new Schema<ITransactionDetail>({
     },
 })
 
-const TransactionDetail = mongoose.model('TransactionDetail', transaction_detail_schema)
+const TransactionDetail = mongoose.model<ITransactionDetail>('TransactionDetail', transaction_detail_schema)
 export default TransactionDetail

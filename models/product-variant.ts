@@ -1,19 +1,21 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { IProduct } from "./product";
 import { ITransactionDetail } from "./transaction-detail";
 import { ICart } from "./cart";
 
-export interface IProductVariant {
+export interface IProductVariant extends Document {
     name: string
     price: number
     image_url: string
     stock: number
     product: IProduct
-    transaction_details: ITransactionDetail
-    carts: ICart
+    transaction_details: ITransactionDetail[]
+    carts: ICart[]
+    createdAt: Date
+    updatedAt: Date
 }
 
-const product_variant_schema = new Schema({
+const product_variant_schema = new Schema<IProductVariant>({
     name: {
         type: String,
         required: true
@@ -49,5 +51,5 @@ const product_variant_schema = new Schema({
     ]
 }, { timestamps: true })
 
-const ProductVariant = mongoose.model('ProductVariant', product_variant_schema)
+const ProductVariant = mongoose.model<IProductVariant>('ProductVariant', product_variant_schema)
 export default ProductVariant

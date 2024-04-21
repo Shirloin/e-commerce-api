@@ -1,11 +1,11 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { IShop } from "./shop";
 import { IProductVariant } from "./product-variant";
 import { IProductCategory } from "./product-category";
 import { ITransactionDetail } from "./transaction-detail";
 import { ICart } from "./cart";
 
-export interface IProduct {
+export interface IProduct extends Document {
     name: string
     description: string
     shop: IShop
@@ -13,10 +13,12 @@ export interface IProduct {
     product_categories: IProductCategory[]
     transaction_details: ITransactionDetail[]
     carts: ICart[]
+    createdAt: Date
+    updatedAt: Date
 }
 
 
-const product_schema = new Schema({
+const product_schema = new Schema<IProduct>({
     name: {
         type: String,
         required: true
@@ -56,5 +58,5 @@ const product_schema = new Schema({
     ]
 }, { timestamps: true })
 
-const Product = mongoose.model('Product', product_schema)
+const Product = mongoose.model<IProduct>('Product', product_schema)
 export default Product

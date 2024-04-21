@@ -4,6 +4,8 @@ import { IProduct } from "./product";
 export interface IProductCategory {
     name: string
     products: IProduct[]
+    createdAt: Date
+    updatedAt: Date
 }
 
 const product_category_schema = new Schema<IProductCategory>({
@@ -19,5 +21,5 @@ const product_category_schema = new Schema<IProductCategory>({
     ]
 }, { timestamps: true })
 
-const ProductCategory = mongoose.model('ProductCategory', product_category_schema)
+const ProductCategory = mongoose.model<IProductCategory>('ProductCategory', product_category_schema)
 export default ProductCategory

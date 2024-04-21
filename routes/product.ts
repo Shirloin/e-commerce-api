@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
 import Shop from "../models/shop";
-import { create_product } from "../controllers/product";
+import { create_product, delete_products, get_product, get_products, update_products } from "../controllers/product";
 
 const router = Router()
 
@@ -26,6 +26,17 @@ router.post('/product', [
     ...validate_product,
     ...validate_product_variant
 ], create_product)
+
+router.get('/product/:id', get_product)
+
+router.get("/products", get_products)
+
+router.put("/product/:id", [
+    ...validate_product
+],
+    update_products)
+
+router.delete('/product/:id', delete_products)
 
 export default router
 

@@ -1,20 +1,17 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 import { IUser } from "./user";
 import { IShop } from "./shop";
 import { ITransactionDetail } from "./transaction-detail";
 
-export interface ITransactionHeader {
-    date: Date
+export interface ITransactionHeader extends Document {
     user: IUser
     shop: IShop
     transaction_details: ITransactionDetail
+    createdAt: Date
+    updatedAt: Date
 }
 
-const transaction_header_schema = new Schema({
-    date: {
-        type: Date,
-        required: true,
-    },
+const transaction_header_schema = new Schema<ITransactionHeader>({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -33,5 +30,5 @@ const transaction_header_schema = new Schema({
     ],
 }, { timestamps: true })
 
-const TransactionHeader = mongoose.model('TransactionHeader', transaction_header_schema)
+const TransactionHeader = mongoose.model<ITransactionHeader>('TransactionHeader', transaction_header_schema)
 export default TransactionHeader

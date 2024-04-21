@@ -8,6 +8,8 @@ export interface ICart {
     user: IUser
     product: IProduct
     product_variant: IProductVariant
+    createdAt: Date
+    updatedAt: Date
 }
 
 const cart_schema = new Schema({

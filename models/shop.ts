@@ -1,6 +1,22 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
+import { IUser } from "./user";
+import { IProduct } from "./product";
+import { ITransactionHeader } from "./transaction-header";
 
-const shop_schema = new Schema({
+export interface IShop extends Document {
+    id: string
+    name: string
+    description: string
+    banner_url: string
+    image_url: string
+    user: IUser
+    transactions: ITransactionHeader[]
+    products: IProduct[]
+    createdAt: Date
+    updatedAt: Date
+}
+
+const shop_schema = new Schema<IShop>({
     name: {
         type: String,
         required: true,
@@ -36,15 +52,7 @@ const shop_schema = new Schema({
     ]
 }, { timestamps: true })
 
-export interface IShop extends Document {
-    id: string
-    name: string
-    description: string
-    banner_url: string
-    image_url: string
-    createdAt: Date
-    updatedAt: Date
-}
 
-const Shop = mongoose.model('Shop', shop_schema)
+
+const Shop = mongoose.model<IShop>('Shop', shop_schema)
 export default Shop

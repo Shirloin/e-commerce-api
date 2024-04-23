@@ -3,6 +3,7 @@ import express, { NextFunction, Request, Response } from 'express'
 import authRoutes from "./routes/auth"
 import productRoutes from "./routes/product"
 import shopRoutes from "./routes/shop"
+import cartRoutes from "./routes/cart"
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import multer, { FileFilterCallback } from 'multer'
@@ -46,13 +47,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use('/images', express.static(path.join(__dirname, 'images')))
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
 
-// Middleware
-app.use(validate_token)
-
 // API
 app.use(authRoutes)
-app.use(productRoutes)
-app.use(shopRoutes)
+app.use(validate_token, productRoutes)
+app.use(validate_token, shopRoutes)
+app.use(validate_token, cartRoutes)
 
 // Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

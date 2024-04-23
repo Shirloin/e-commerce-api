@@ -38,3 +38,5 @@ router.put('/cart/:id', [
 ], update_cart)
 
 router.delete('/cart/:id', delete_cart)
+
+export default router

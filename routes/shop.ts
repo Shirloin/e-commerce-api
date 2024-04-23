@@ -40,7 +40,6 @@ router.get('/shops', get_shops)
 
 router.get('/shop/:id', get_shop)
 
-
 router.put('/shop/:id', [
     ...validate_shop
 ], update_products)

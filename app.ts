@@ -7,6 +7,7 @@ import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import multer, { FileFilterCallback } from 'multer'
 import path from 'path'
+import { validate_token } from './middleware/middleware'
 
 const app = express()
 
@@ -44,6 +45,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Handle Upload File
 app.use('/images', express.static(path.join(__dirname, 'images')))
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
+
+// Middleware
+app.use(validate_token)
 
 // API
 app.use(authRoutes)

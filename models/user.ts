@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
 import { Types } from "mongoose";
 import { Schema } from "mongoose";
 import { IShop } from "./shop";
@@ -6,8 +6,7 @@ import { Model } from "mongoose";
 import { ITransactionHeader } from "./transaction-header";
 import { ICart } from "./cart";
 
-export interface IUser {
-    _id: Types.ObjectId;
+export interface IUser extends Document{
     username: string;
     email: string;
     password: string;
@@ -16,8 +15,8 @@ export interface IUser {
     image_url: string;
     phone: string;
     shop: IShop;
-    transactions: ITransactionHeader[]
-    carts: ICart[]
+    transactions: Types.Array<ITransactionHeader>
+    carts: Types.Array<ICart>
 }
 
 const user_schema = new Schema<IUser>({

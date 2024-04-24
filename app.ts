@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth"
 import productRoutes from "./routes/product"
 import shopRoutes from "./routes/shop"
 import cartRoutes from "./routes/cart"
+import transactionRoutes from "./routes/transaction"
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 import multer, { FileFilterCallback } from 'multer'
@@ -52,6 +53,7 @@ app.use(authRoutes)
 app.use(validate_token, productRoutes)
 app.use(validate_token, shopRoutes)
 app.use(validate_token, cartRoutes)
+app.use(validate_token, transactionRoutes)
 
 // Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

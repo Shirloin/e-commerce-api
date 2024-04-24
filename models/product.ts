@@ -44,12 +44,6 @@ const product_schema = new Schema<IProduct>({
             ref: 'ProductCategory'
         }
     ],
-    transaction_details: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'TransactionDetail'
-        }
-    ],
     carts: [
         {
             type: Schema.Types.ObjectId,

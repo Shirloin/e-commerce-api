@@ -4,7 +4,6 @@ import { IProduct } from "./product";
 import { ITransactionHeader } from "./transaction-header";
 
 export interface IShop extends Document {
-    id: string
     name: string
     description: string
     banner_url: string

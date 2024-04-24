@@ -6,7 +6,7 @@ import { ITransactionDetail } from "./transaction-detail";
 export interface ITransactionHeader extends Document {
     user: IUser
     shop: IShop
-    transaction_details: ITransactionDetail
+    transaction_details: ITransactionDetail[]
     createdAt: Date
     updatedAt: Date
 }

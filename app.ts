@@ -57,10 +57,11 @@ app.use(validate_token, transactionRoutes)
 
 // Error Handling
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    const status = err.statusCode || 500
-    const message = err.message
-    const data = err.data
-    res.status(status).json({ message: message, data: data })
+    const status = err.statusCode || 500;
+    const msg = err.msg || 'Internal Server Error';
+    const data = err.data || {};
+
+    res.status(status).json({ msg: msg, data: data });
 })
 
 mongoose

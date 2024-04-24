@@ -4,88 +4,60 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
 import { IRequest } from "../interfaces/request-interface";
+import { IError } from "../interfaces/error-interface";
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY"
 
-export function register(req: IRequest, res: Response, next: NextFunction) {
+export async function register(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        const error = new Error('Validation Failed') as any
+        const error = new Error('Validation Failed') as IError
         error.statusCode = 422
-        error.message = errors.array()[0].msg
-        throw error
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
-    const username = req.body.username
-    const email = req.body.email
-    const password = req.body.password
-    bcryptjs.hash(password, 12)
-        .then(hashedPw => {
-            const user = new User({
-                username: username,
-                email: email,
-                password: hashedPw
-            })
-            return user.save()
+    const { username, email, password } = req.body
+    try {
+        const hashedPw = bcryptjs.hash(password, 12)
+        const user = await User.create({
+            username: username,
+            email: email,
+            password: hashedPw
         })
-        .then(result => {
-            res.status(201).json({ message: 'Register Successfull', userId: result._id })
-        })
-        .catch(err => {
-            if (!err.statusCode) {
-                err.statusCode = 500
-            }
-            next(err)
-        })
+        res.status(201).json({ msg: 'Register Successfull', user_id: user._id })
+    } catch (error) {
+        next(error)
+    }
 }
 
-export function login(req: IRequest, res: Response, next: NextFunction) {
+export async function login(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        const error = new Error('Validation Failed') as any
+        const error = new Error('Validation Failed') as IError
         error.statusCode = 422
-        error.message = errors.array()[0].msg
-        throw error
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
-    const username = req.body.username
-    const password = req.body.password
-    let loadedUser: any = null
-    User.findOne({ username: username })
-        .then(user => {
-            if (!user) {
-                const error = new Error('Username not found') as any
-                error.statusCode = 401
-                throw error
-            }
-            loadedUser = user
-            return bcryptjs.compare(password, user.password)
-        })
-        .then(isEqual => {
-            if (!isEqual) {
-                const error = new Error('Wrong Password!') as any
-                error.statusCode = 401
-                throw error
-            }
-            const user = {
-                user_id: loadedUser._id.toString(),
-                username: loadedUser.username,
-                email: loadedUser.email,
-                dob: loadedUser.dob,
-                gender: loadedUser.gender,
-                phone: loadedUser.phone,
-                imageUrl: loadedUser.imageUrl
-            }
-            const token = jwt.sign({
-                user_id: loadedUser._id.toString(),
-            },
-                SECRET_KEY, { expiresIn: '24h' })
-            res.status(200).json({ token: token, user: user, })
-        })
-        .catch(err => {
-            if (!err.statusCode) {
-                err.statusCode = 500
-            }
-            next(err)
-        })
-
-
+    const { username, password } = req.body
+    try {
+        const user = await User.findOne({ username: username })
+        if (!user) {
+            const error = new Error('Username not found') as IError;
+            error.statusCode = 404;
+            throw error;
+        }
+        const isEqual = await bcryptjs.compare(password, user.password)
+        if (!isEqual) {
+            const error = new Error('Wrong password') as IError;
+            error.statusCode = 401;
+            throw error;
+        }
+        const token = jwt.sign({
+            user_id: user._id.toString(),
+        },
+            SECRET_KEY, { expiresIn: '24h' })
+        res.status(200).json({ token: token, user: user, })
+    } catch (error) {
+        next(error)
+    }
 }

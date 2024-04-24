@@ -5,18 +5,24 @@ import ProductVariant from "../models/product-variant";
 import Product from "../models/product";
 import { IRequest } from "../interfaces/request-interface";
 import User from "../models/user";
+import { IError } from "../interfaces/error-interface";
 
 export async function create_shop(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+        const error = new Error('Validation Failed') as IError
+        error.statusCode = 422
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
     const { name, description } = req.body
     const { user_id } = req.user
     try {
         const user = await User.findById(user_id)
-        if(!user){
-            return res.status(404).json({error: "User not found"})
+        if (!user) {
+            const error = new Error('User not found') as IError;
+            error.statusCode = 404;
+            throw error;
         }
         const shop = await Shop.create({
             name: name,
@@ -25,9 +31,9 @@ export async function create_shop(req: IRequest, res: Response, next: NextFuncti
         })
         user.shop = shop
         await user.save()
-        res.status(201).json({message: "Create shop success",shop: shop})
+        res.status(201).json({ message: "Create shop success", shop: shop })
     } catch (error) {
-        return res.status(500).json({error: "Error creating shop"})
+        next(error)
     }
 }
 
@@ -41,7 +47,7 @@ export async function get_shops(req: IRequest, res: Response, next: NextFunction
         })
         return res.status(200).json({ shops: shops })
     } catch (error) {
-        return res.status(500).json({ error: "Error fetching shops" })
+        next(error)
     }
 }
 
@@ -55,33 +61,39 @@ export async function get_shop(req: IRequest, res: Response, next: NextFunction)
             }
         })
         if (!shop) {
-            return res.status(404).json({ error: "Shop not found" })
+            const error = new Error("Shop not found") as IError
+            error.statusCode = 404
+            throw error
         }
         return res.status(200).json({ shop: shop })
     } catch (error) {
-        console.log(`Error fetching shop: `, error)
-        return res.status(500).json({ error: "Error fetching shop" })
+        next(error)
     }
 }
 
 export async function update_shop(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+        const error = new Error('Validation Failed') as IError
+        error.statusCode = 422
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
     const { name, description } = req.body
     const { id } = req.params
     try {
         const shop = await Shop.findById(id)
         if (!shop) {
-            return res.status(404).json({ error: "Shop not found" })
+            const error = new Error("Shop not found") as IError
+            error.statusCode = 404
+            throw error
         }
         shop.name = name
         shop.description = description
         await shop.save()
         return res.status(200).json({ shop: shop })
     } catch (error) {
-        return res.status(500).json({ error: "Error updating shop" })
+        next(error)
     }
 }
 
@@ -90,7 +102,9 @@ export async function delete_shop(req: IRequest, res: Response, next: NextFuncti
     try {
         const shop = await Shop.findByIdAndDelete(id)
         if (!shop) {
-            return res.status(404).json({ error: "Shop not found" })
+            const error = new Error("Shop not found") as IError
+            error.statusCode = 404
+            throw error
         }
         for (const product of shop.products) {
             await Product.deleteOne({ _id: product._id })
@@ -98,6 +112,6 @@ export async function delete_shop(req: IRequest, res: Response, next: NextFuncti
         }
         return res.status(200).json({ message: "Delete shop success" })
     } catch (error) {
-        return res.status(500).json({ error: "Error deleting shop" })
+        next(error)
     }
 }

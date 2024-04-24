@@ -5,11 +5,15 @@ import ProductVariant from "../models/product-variant";
 import Shop from "../models/shop";
 import { IRequest } from "../interfaces/request-interface";
 import User from "../models/user";
+import { IError } from "../interfaces/error-interface";
 
 export async function create_product(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+        const error = new Error('Validation Failed') as IError
+        error.statusCode = 422
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
     const { name, description, product_variants } = req.body;
     const {user_id} = req.user
@@ -18,7 +22,9 @@ export async function create_product(req: IRequest, res: Response, next: NextFun
 
         const shop = await Shop.findOne({user: user_id})
         if(!shop){
-            return res.status(404).json({error: "Shop does not exist"})
+            const error = new Error("Shop not found") as IError
+            error.statusCode = 404
+            throw error
         }
 
         const product = await Product.create({
@@ -41,8 +47,7 @@ export async function create_product(req: IRequest, res: Response, next: NextFun
         await shop.save()
         return res.status(201).json({ product: product })
     } catch (error) {
-        console.error("Error creating product or variants: ", error)
-        return res.status(500).json({ error: error })
+        next(error)
     }
 
 
@@ -53,13 +58,14 @@ export async function get_product(req: IRequest, res: Response, next: NextFuncti
     try {
         const product = await Product.findById(id).populate('product_variants').populate('shop')
         if (!product) {
-            return res.status(404).json({ error: "Product Not Found" })
+            const error = new Error("Product not found") as IError
+            error.statusCode = 404
+            throw error
         }
 
         return res.status(200).json({ product: product })
     } catch (error) {
-        console.log("Error fetching product with variants: ", error)
-        return res.status(500).json({ error: "Error fetching product with variants" })
+        next(error)
     }
 }
 
@@ -68,21 +74,26 @@ export async function get_products(req: IRequest, res: Response, next: NextFunct
         const products = await Product.find().populate('product_variants').populate('shop')
         return res.status(200).json({ products: products })
     } catch (error) {
-        return res.status(500).json({ error: "Error fetching products" })
+        next(error)
     }
 }
 
 export async function update_products(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
-        return res.status(422).json({ errors: errors.array() })
+        const error = new Error('Validation Failed') as IError
+        error.statusCode = 422
+        error.msg = errors.array()[0].msg
+        return next(error)
     }
     const { name, description } = req.body
     const { id } = req.params
     try {
         const product = await Product.findById(id)
         if (!product) {
-            return res.status(404).json({ error: "Product not found" })
+            const error = new Error("Product not found") as IError
+            error.statusCode = 404
+            throw error
         }
 
         product.name = name
@@ -90,7 +101,7 @@ export async function update_products(req: IRequest, res: Response, next: NextFu
         await product.save()
         return res.status(200).json({ product: product })
     } catch (error) {
-        return res.status(500).json({ error: "Error updating product" })
+        next(error)
     }
 }
 
@@ -100,14 +111,18 @@ export async function delete_products(req: IRequest, res: Response, next: NextFu
         const product = await Product.findById(id);
 
         if (!product) {
-            return res.status(404).json({ error: "Product not found" });
+            const error = new Error("Product not found") as IError
+            error.statusCode = 404
+            throw error
         }
         await ProductVariant.deleteMany({ product: product._id });
 
         const shop = await Shop.findById(product.shop);
 
         if (!shop) {
-            return res.status(404).json({ error: "Shop not found" });
+            const error = new Error("Shop not found") as IError
+            error.statusCode = 404
+            throw error
         }
         const index = shop.products.indexOf(product._id);
         if (index !== -1) {
@@ -119,6 +134,6 @@ export async function delete_products(req: IRequest, res: Response, next: NextFu
 
         return res.status(200).json({ message: "Delete product and variants success" });
     } catch (error) {
-        return res.status(500).json({ error: "Error updating product" })
+        next(error)
     }
 }

@@ -16,20 +16,6 @@ const validate_shop = [
         .trim()
         .notEmpty()
         .withMessage("Shop desription must be filled"),
-    body('user_id')
-        .trim()
-        .notEmpty()
-        .withMessage("User does not exist")
-        .custom(async (value, { req }) => {
-            const user = await User.findById(value)
-            if (!user) {
-                return Promise.reject("User does not exist")
-            }
-            const shop = await Shop.findOne({ user: value })
-            if (shop) {
-                return Promise.reject("User has already created a shop")
-            }
-        })
 ]
 
 router.post('/shop', [

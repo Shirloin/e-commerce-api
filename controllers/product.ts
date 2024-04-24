@@ -3,24 +3,28 @@ import { validationResult } from "express-validator";
 import Product from "../models/product";
 import ProductVariant from "../models/product-variant";
 import Shop from "../models/shop";
+import { IRequest } from "../interfaces/request-interface";
+import User from "../models/user";
 
-export async function create_product(req: Request, res: Response, next: NextFunction) {
+export async function create_product(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() })
-        // const error = new Error('Validation Failed') as any
-        // error.statusCode = 422
-        // error.message = errors.array()[0].msg
-        // throw error
     }
-    const { name, description, shop_id, product_variants } = req.body;
+    const { name, description, product_variants } = req.body;
+    const {user_id} = req.user
 
     try {
+
+        const shop = await Shop.findOne({user: user_id})
+        if(!shop){
+            return res.status(404).json({error: "Shop does not exist"})
+        }
 
         const product = await Product.create({
             name: name,
             description: description,
-            shop: shop_id
+            shop: shop._id
         })
         for (const pv of product_variants) {
             const product_variant = await ProductVariant.create({
@@ -33,7 +37,6 @@ export async function create_product(req: Request, res: Response, next: NextFunc
             product.product_variants.push(product_variant._id)
             await product.save()
         }
-        const shop = await Shop.findById(shop_id)
         shop.products.push(product._id)
         await shop.save()
         return res.status(201).json({ product: product })
@@ -45,10 +48,10 @@ export async function create_product(req: Request, res: Response, next: NextFunc
 
 }
 
-export async function get_product(req: Request, res: Response, next: NextFunction) {
+export async function get_product(req: IRequest, res: Response, next: NextFunction) {
     const { id } = req.params
     try {
-        const product = await Product.findById(id).populate('product_variants')
+        const product = await Product.findById(id).populate('product_variants').populate('shop')
         if (!product) {
             return res.status(404).json({ error: "Product Not Found" })
         }
@@ -60,16 +63,16 @@ export async function get_product(req: Request, res: Response, next: NextFunctio
     }
 }
 
-export async function get_products(req: Request, res: Response, next: NextFunction) {
+export async function get_products(req: IRequest, res: Response, next: NextFunction) {
     try {
-        const products = await Product.find().populate('product_variants')
+        const products = await Product.find().populate('product_variants').populate('shop')
         return res.status(200).json({ products: products })
     } catch (error) {
         return res.status(500).json({ error: "Error fetching products" })
     }
 }
 
-export async function update_products(req: Request, res: Response, next: NextFunction) {
+export async function update_products(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         return res.status(422).json({ errors: errors.array() })
@@ -91,7 +94,7 @@ export async function update_products(req: Request, res: Response, next: NextFun
     }
 }
 
-export async function delete_products(req: Request, res: Response, next: NextFunction) {
+export async function delete_products(req: IRequest, res: Response, next: NextFunction) {
     const { id } = req.params
     try {
         const product = await Product.findById(id);

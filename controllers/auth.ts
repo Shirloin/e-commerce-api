@@ -3,10 +3,11 @@ import User from "../models/user";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { validationResult } from "express-validator";
+import { IRequest } from "../interfaces/request-interface";
 
 const SECRET_KEY = process.env.JWT_SECRET_KEY || "JWT_SECRET_KEY"
 
-export function register(req: Request, res: Response, next: NextFunction) {
+export function register(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         const error = new Error('Validation Failed') as any
@@ -37,7 +38,7 @@ export function register(req: Request, res: Response, next: NextFunction) {
         })
 }
 
-export function login(req: Request, res: Response, next: NextFunction) {
+export function login(req: IRequest, res: Response, next: NextFunction) {
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
         const error = new Error('Validation Failed') as any
@@ -65,7 +66,7 @@ export function login(req: Request, res: Response, next: NextFunction) {
                 throw error
             }
             const user = {
-                userId: loadedUser._id.toString(),
+                user_id: loadedUser._id.toString(),
                 username: loadedUser.username,
                 email: loadedUser.email,
                 dob: loadedUser.dob,
@@ -74,7 +75,7 @@ export function login(req: Request, res: Response, next: NextFunction) {
                 imageUrl: loadedUser.imageUrl
             }
             const token = jwt.sign({
-                userId: loadedUser._id.toString(),
+                user_id: loadedUser._id.toString(),
             },
                 SECRET_KEY, { expiresIn: '24h' })
             res.status(200).json({ token: token, user: user, })

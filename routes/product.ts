@@ -7,11 +7,7 @@ const router = Router()
 
 const validate_product = [
     body('name').trim().notEmpty().withMessage('Product name must be filled'),
-    body('description').trim().notEmpty().withMessage('Product description must be filled'),
-    body('shop_id').custom(async (value) => {
-        const shop = await Shop.findById(value)
-        if (!shop) return Promise.reject('Shop does not exist')
-    }),
+    body('description').trim().notEmpty().withMessage('Product description must be filled')
 ]
 
 const validate_product_variant = [

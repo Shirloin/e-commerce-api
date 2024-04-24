@@ -34,6 +34,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
     }
 }
 
+// BodyParser
 app.use(bodyParser.json())
 
 // Handle CORS
